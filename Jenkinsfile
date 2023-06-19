@@ -1,28 +1,37 @@
-pipeline 
-{
- agent any
- tools {
- // Install the Maven version "M3" and add to the path
- maven "Maven 3"
- }
- stages {
- stage('Build') {
- steps {
- // Get some code from a GitHub repository
- git 'https://github.com/abhishekghode/joda-time.git'
- // Run Maven on a Unix agent.
- //sh "mvn -Dmaven.test.failure.ignore=true clean package"
- // To run Maven on a Windows agent
- bat "mvn -Dmaven.test.failure.ignore=true clean package"
- }
- post {
- // Record the test results
- success {
- junit '**/target/surefire-reports/TEST-*.xml'
-//Archive the jar
- archiveArtifacts 'target/*.jar'
- }
- }
- }
- }
-}
+pipeline {
+    agent any
+      stages {
+        stage('Compile') {
+            steps {
+                echo 'Code Compiling'
+                git URL: https://github.com/JenkinsMavenRepo/samplejavaapp.git'
+		sh script: '/var/lib/jenkins/jobs/Compile'
+            }
+        }
+         stage('Review') {
+            steps {
+                echo 'Code Review-pmd:pmd'
+                git URL: https://github.com/JenkinsMavenRepo/samplejavaapp.git'
+		sh script: '/var/lib/jenkins/jobs/Review'
+            }
+        }
+         stage('UnitTest') {
+            steps {
+                echo 'JUnit testing-*xml'
+                git URL: https://github.com/JenkinsMavenRepo/samplejavaapp.git'
+		sh script: '/var/lib/jenkins/jobs/UnitTest'
+            }
+        }
+         stage('Coverage') {
+            steps {
+                echo 'Code Coverage-Jacoco coverage-*.exec'
+                git URL: https://github.com/JenkinsMavenRepo/samplejavaapp.git'
+		sh script: '/var/lib/jenkins/jobs/Coverage'
+            }
+        }
+         stage('Package') {
+            steps {
+                echo 'Creating an Artifact-*.war file'
+                git URL: https://github.com/JenkinsMavenRepo/samplejavaapp.git'
+		sh script: '/var/lib/jenkins/jobs/Package'
+            }
